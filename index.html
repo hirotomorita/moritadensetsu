@@ -1,0 +1,251 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Sun, Moon, Menu, X, Phone, MapPin, User, Calendar, Zap, CheckCircle2, ChevronRight, Mail, Building } from 'lucide-react';
+
+// スクロール時に要素をふわっと表示させるコンポーネント
+const FadeInSection = ({ children, delay = 0, className = '' }) => {
+  const [isVisible, setVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.unobserve(domRef.current);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    const currentRef = domRef.current;
+    if (currentRef) observer.observe(currentRef);
+    return () => { if (currentRef) observer.unobserve(currentRef); };
+  }, []);
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+      } ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+
+  const navLinks = [
+    { name: 'ホーム', href: '#home' },
+    { name: '事業内容', href: '#services' },
+    { name: '会社概要', href: '#company' },
+    { name: 'お問い合わせ', href: '#contact' },
+  ];
+
+  const services = [
+    { title: '一般電気工事', desc: '住宅や店舗の配線、照明設置、コンセント増設など幅広く対応いたします。' },
+    { title: '空調設備工事', desc: '業務用・家庭用エアコンの取り付けからメンテナンスまで行います。' },
+    { title: '受変電設備点検', desc: 'キュービクル等の保守点検を行い、安全な電力供給をサポートします。' },
+    { title: 'LED照明改修', desc: '省エネ・コスト削減のためのLED化工事を提案・実施します。' },
+  ];
+
+  const companyDetails = [
+    { icon: <Building size={20} />, label: '会社名', value: '株式会社森田電設' },
+    { icon: <User size={20} />, label: '代表者', value: '森田 克也' },
+    { icon: <MapPin size={20} />, label: '本社', value: '〒596-0802 大阪府岸和田市西大路町119-11' },
+    { icon: <Phone size={20} />, label: 'TEL', value: '0724-41-2417' },
+    { icon: <Calendar size={20} />, label: '設立日', value: '2014年' },
+    { icon: <Zap size={20} />, label: '事業内容', value: '電気工事一般' },
+  ];
+
+  return (
+    <div className={darkMode ? 'dark' : ''}>
+      <div className="min-h-screen bg-white dark:bg-slate-900 text-black dark:text-white font-sans transition-colors duration-300 overflow-x-hidden">
+        
+        {/* Navigation */}
+        <header className="fixed top-0 w-full z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#home" className="text-xl md:text-2xl font-black tracking-tighter flex items-center gap-2">
+              <span className="text-blue-600">株式会社</span>森田電設
+            </a>
+
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex items-center gap-10">
+              <ul className="flex items-center gap-8 text-sm font-bold tracking-widest uppercase">
+                {navLinks.map((link) => (
+                  <li key={link.name}>
+                    <a href={link.href} className="hover:text-blue-600 transition-colors">
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <button 
+                onClick={toggleDarkMode} 
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-blue-600"
+              >
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            </nav>
+
+            {/* Mobile Nav Toggle */}
+            <div className="flex items-center gap-4 md:hidden">
+              <button onClick={toggleDarkMode} className="p-2 text-blue-600">
+                {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
+                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className={`md:hidden absolute top-20 left-0 w-full bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 invisible'}`}>
+            <ul className="px-6 py-6 space-y-4 font-bold">
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  <a href={link.href} onClick={() => setIsMenuOpen(false)} className="block py-2 hover:text-blue-600">
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </header>
+
+        <main>
+          {/* １．HOME Section */}
+          <section id="home" className="relative h-[90vh] flex items-center justify-center pt-20 overflow-hidden">
+            {/* 背景画像（電気工事の写真） */}
+            <div className="absolute inset-0 z-0">
+              <div className="absolute inset-0 bg-black/60 z-10"></div>
+              <div className="w-full h-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-white/40">
+                [電気工事の現場写真]
+              </div>
+            </div>
+
+            <div className="relative z-20 max-w-5xl mx-auto px-6 text-center text-white">
+              <FadeInSection>
+                <h2 className="text-blue-400 font-bold tracking-[0.2em] mb-4 text-sm md:text-lg uppercase">
+                  Quality & Sincerity
+                </h2>
+              </FadeInSection>
+              <FadeInSection delay={200}>
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight mb-8">
+                  感謝、誠実、謙虚をもとに<br />
+                  お客様のご依頼に応える企業
+                </h1>
+              </FadeInSection>
+              <FadeInSection delay={400}>
+                <a href="#contact" className="inline-flex items-center gap-2 px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-none font-bold transition-all transform hover:scale-105 shadow-lg shadow-blue-600/30">
+                  ご相談・お問い合わせ
+                  <ChevronRight size={20} />
+                </a>
+              </FadeInSection>
+            </div>
+            
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden md:block z-20">
+              <div className="w-px h-16 bg-white/50 mx-auto"></div>
+            </div>
+          </section>
+
+          {/* ３．事業内容 Section */}
+          <section id="services" className="py-24 px-6 bg-white dark:bg-slate-900">
+            <div className="max-w-7xl mx-auto">
+              <FadeInSection className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-black mb-4">事業内容</h2>
+                <div className="w-20 h-1.5 bg-blue-600 mx-auto"></div>
+              </FadeInSection>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {services.map((service, index) => (
+                  <FadeInSection key={index} delay={index * 100}>
+                    <div className="p-8 border border-slate-100 dark:border-slate-800 hover:border-blue-600 dark:hover:border-blue-600 transition-all group h-full flex flex-col bg-white dark:bg-slate-900 shadow-sm hover:shadow-md">
+                      <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <CheckCircle2 size={24} />
+                      </div>
+                      <h3 className="text-xl font-bold mb-4">{service.title}</h3>
+                      <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        {service.desc}
+                      </p>
+                    </div>
+                  </FadeInSection>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ２．会社概要 Section */}
+          <section id="company" className="py-24 px-6 bg-slate-50 dark:bg-slate-800/30">
+            <div className="max-w-4xl mx-auto">
+              <FadeInSection className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-black mb-4">会社概要</h2>
+                <div className="w-20 h-1.5 bg-blue-600 mx-auto"></div>
+              </FadeInSection>
+
+              <FadeInSection delay={200}>
+                <div className="bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {companyDetails.map((detail, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row p-6 sm:p-8 items-start sm:items-center">
+                        <div className="flex items-center gap-3 w-full sm:w-1/3 mb-2 sm:mb-0 text-blue-600 font-bold">
+                          {detail.icon}
+                          <span className="text-sm tracking-widest">{detail.label}</span>
+                        </div>
+                        <div className="w-full sm:w-2/3 text-lg font-medium">
+                          {detail.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </FadeInSection>
+            </div>
+          </section>
+
+          {/* お問い合わせ Section */}
+          <section id="contact" className="py-24 px-6 bg-white dark:bg-slate-900">
+            <div className="max-w-4xl mx-auto text-center">
+              <FadeInSection>
+                <h2 className="text-3xl md:text-5xl font-black mb-8 italic">LET'S CONNECT</h2>
+                <p className="text-slate-600 dark:text-slate-400 mb-12 text-lg">
+                  電気に関することなら何でもご相談ください。<br />
+                  お見積り・現地調査は無料で承っております。
+                </p>
+                <div className="flex flex-wrap justify-center gap-6">
+                  <a href="tel:0724-41-2417" className="flex items-center gap-3 px-8 py-5 bg-blue-600 text-white font-bold text-xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-600/20">
+                    <Phone size={24} />
+                    0724-41-2417
+                  </a>
+                  <a href="mailto:info@example.com" className="flex items-center gap-3 px-8 py-5 border-2 border-blue-600 text-blue-600 font-bold text-xl hover:bg-blue-600 hover:text-white transition-all">
+                    <Mail size={24} />
+                    メールでのお問い合わせ
+                  </a>
+                </div>
+              </FadeInSection>
+            </div>
+          </section>
+        </main>
+
+        <footer className="py-12 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-6">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+            <div className="text-xl font-black">
+              <span className="text-blue-600">株式会社</span>森田電設
+            </div>
+            <div className="text-slate-500 text-xs font-bold tracking-widest">
+              © {new Date().getFullYear()} MORITA DENSETSU INC. ALL RIGHTS RESERVED.
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}
